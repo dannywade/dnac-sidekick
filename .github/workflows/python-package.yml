@@ -40,4 +40,10 @@ jobs:
     - name: Test with pytest (with coverage)
       run: |
         source $VENV
-        pytest tests -v --cov=./dnac_sidekick
+        pytest tests -v --cov=./dnac_sidekick --cov-report=xml:./coverage.xml --cov-report term-missing
+    - name: Upload code coverage
+      uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.xml
+        name: dnac_sidekick
