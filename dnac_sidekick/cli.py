@@ -21,6 +21,7 @@ from dotenv import load_dotenv, set_key
 
 from inventory import commands as inventory_cmds
 from health import commands as health_cmds
+from device_commands import commands as device_commands_cmds
 
 dotenv_file = "../.env"
 load_dotenv(dotenv_file)
@@ -36,6 +37,10 @@ class DnacUser(object):
 @click.group()
 @click.pass_context
 def dnac_cli(ctx):
+    """
+    Extract sensitive info from environment variables that will be used to connect to DNA Center and add to Click Context.
+    By adding to Click Context, these values can be used across all commands.
+    """
     dnac_url = os.environ.get("DNAC_URL")
     username = os.environ.get("DNAC_USER")
     password = os.environ.get("DNAC_PASS")
@@ -51,7 +56,7 @@ def dnac_cli(ctx):
 @click.option("--password", default="", envvar="DNAC_PASS", help="Password for login account")
 @click.pass_context
 def login(ctx, dnac_url, username, password):
-    """ Use username and password to authenticate to DNAC. """
+    """ Use username and password to authenticate to DNAC and retrieve token. Token will be saved as environment variable for future use. """
     click.echo("Attempting to login to DNAC...")
     if not dnac_url:
         raise ValueError("DNAC URL has not been provided and has not been set as an environment variable.")
@@ -92,6 +97,7 @@ def health(ctx):
 inventory.add_command(inventory_cmds.devices)
 health.add_command(health_cmds.devices)
 health.add_command(health_cmds.clients)
+dnac_cli.add_command(device_commands_cmds.command_runner)
 
 if __name__ == "__main__":
     dnac_cli()
