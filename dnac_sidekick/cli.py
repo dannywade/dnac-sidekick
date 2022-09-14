@@ -27,12 +27,14 @@ dotenv_file = "../.env"
 load_dotenv(dotenv_file)
 requests.packages.urllib3.disable_warnings()
 
+
 class DnacUser(object):
     def __init__(self, dnac_url=None, username=None, password=None, token=None):
         self.dnac_url = dnac_url
         self.dnac_user = username
         self.dnac_pass = password
         self.token = token
+
 
 @click.group()
 @click.pass_context
@@ -46,26 +48,45 @@ def dnac_cli(ctx):
     password = os.environ.get("DNAC_PASS")
     token = os.environ.get("DNAC_TOKEN")
     if (dnac_url, username, password, token):
-        ctx.obj = DnacUser(dnac_url=dnac_url,username=username,password=password,token=token)
+        ctx.obj = DnacUser(
+            dnac_url=dnac_url, username=username, password=password, token=token
+        )
     else:
         click.echo("A necessary environment variable is not set.")
 
+
 @dnac_cli.command
-@click.option("--dnac_url", default="", envvar="DNAC_URL", help="IP/hostname to the DNA Center appliance")
-@click.option("--username", default="", envvar="DNAC_USER", help="User for login account")
-@click.option("--password", default="", envvar="DNAC_PASS", help="Password for login account")
+@click.option(
+    "--dnac_url",
+    default="",
+    envvar="DNAC_URL",
+    help="IP/hostname to the DNA Center appliance",
+)
+@click.option(
+    "--username", default="", envvar="DNAC_USER", help="User for login account"
+)
+@click.option(
+    "--password", default="", envvar="DNAC_PASS", help="Password for login account"
+)
 @click.pass_context
 def login(ctx, dnac_url, username, password):
-    """ Use username and password to authenticate to DNAC and retrieve token. Token will be saved as environment variable for future use. """
+    """Use username and password to authenticate to DNAC and retrieve token. Token will be saved as environment variable for future use."""
     click.echo("Attempting to login to DNAC...")
     if not dnac_url:
-        raise ValueError("DNAC URL has not been provided and has not been set as an environment variable.")
+        raise ValueError(
+            "DNAC URL has not been provided and has not been set as an environment variable."
+        )
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
     }
     dnac_token_url = f"{dnac_url}/dna/system/api/v1/auth/token"
-    token = requests.post(url=dnac_token_url, headers=headers, auth=HTTPBasicAuth(username=username, password=password), verify=False)
+    token = requests.post(
+        url=dnac_token_url,
+        headers=headers,
+        auth=HTTPBasicAuth(username=username, password=password),
+        verify=False,
+    )
     if token.status_code == 200:
         actual_token = token.json()["Token"]
         click.echo("Token generated successfully!")
@@ -75,24 +96,28 @@ def login(ctx, dnac_url, username, password):
     else:
         click.echo("Token not generated. Please try again...")
 
+
 @dnac_cli.group()
 @click.pass_context
 def get(ctx):
-    """ Action for read-only tasks and gathering information. """
+    """Action for read-only tasks and gathering information."""
     click.echo("Getting information...")
     pass
+
 
 @get.group()
 @click.pass_context
 def inventory(ctx):
-    """ Gathers information related to device inventory in DNAC """
+    """Gathers information related to device inventory in DNAC"""
     pass
+
 
 @get.group()
 @click.pass_context
 def health(ctx):
-    """ Gathers health information for network devices and clients in DNAC """
+    """Gathers health information for network devices and clients in DNAC"""
     pass
+
 
 inventory.add_command(inventory_cmds.devices)
 health.add_command(health_cmds.devices)
