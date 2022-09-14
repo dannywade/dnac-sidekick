@@ -1,6 +1,6 @@
 import requests
 from click.testing import CliRunner
-from cli import dnac_cli
+from dnac_sidekick.cli import dnac_cli
 import os
 import time
 

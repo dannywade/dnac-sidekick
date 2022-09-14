@@ -1,7 +1,7 @@
 .PHONY: format test
 
 format: 
-	black .
+	black . --check
 
 test:
-	PYTHONPATH=./dnac_sidekick pytest --cov
+	pytest tests -v --cov=./dnac_sidekick

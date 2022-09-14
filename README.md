@@ -11,24 +11,25 @@ python -m pip install dnac-sidekick
 
 ## Getting Started
 
-Users can either store their DNAC login credentials as environment variables or use CLI `login` argument authenticate to their DNAC instance.
+### Authenticating to DNAC
+Users can either store their DNAC login credentials (username/password) as environment variables or use the CLI ` dnac-sidekick login` argument authenticate to their DNAC instance.
 
 ### CLI Login
 ```
 dnac-sidekick login --dnac_url <url> --username <user> --password <password>
 ```
-Once completed, these values will be stored as local environment variables to use with future API requests.
+Once completed, these values will be used to generate a bearer token and store all values as local environment variables to use with future API requests.
 
 ### Environment Variables
 
-If using local environment variables to configure DNAC credentials, please use the following names:
+Alternatively, you can set the environment variables yourself. If setting them manually, please use the following names:
 ```
 DNAC_URL=<https://dnac_url>
 DNAC_USER=<username>
 DNAC_PASS=<password>
 ```
 
-*IMPORTANT:* Once the local environment variables are set, make sure to generate a token using the `dnac-sidekick login` command. Unlike the previous CLI Login example, the DNAC URL, username, and password will automatically be pulled from the environment variables, so there's no need to set additional flags.
+*IMPORTANT:* If setting the environment variables manually, please make sure to generate the bearer token using the `dnac-sidekick login` command. Since the environment variables are set, there's no need to set additional flags.
 
 ## Usage
 If you are ever stuck with what commands are available, please use `--help`. Here's a brief look at what root commands/options available:
