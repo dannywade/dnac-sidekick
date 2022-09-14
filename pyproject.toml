@@ -36,6 +36,9 @@ tomli = "2.0.1"
 typing-extensions = "4.3.0"
 urllib3 = "1.26.12"
 
+[tool.poetry.scripts]
+dnac_sidekick = "dnac_sidekick.cli:dnac_cli"
+
 
 [build-system]
 requires = ["poetry-core"]

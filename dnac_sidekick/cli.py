@@ -19,9 +19,9 @@ from requests.auth import HTTPBasicAuth
 import os
 from dotenv import load_dotenv, set_key
 
-from inventory import commands as inventory_cmds
-from health import commands as health_cmds
-from device_commands import commands as device_commands_cmds
+from dnac_sidekick.inventory import commands as inventory_cmds
+from dnac_sidekick.health import commands as health_cmds
+from dnac_sidekick.device_commands import commands as device_commands_cmds
 
 dotenv_file = "../.env"
 load_dotenv(dotenv_file)
@@ -66,14 +66,18 @@ def dnac_cli(ctx):
     "--username", default="", envvar="DNAC_USER", help="User for login account"
 )
 @click.option(
-    "--password", default="", envvar="DNAC_PASS", help="Password for login account"
+    "--password",
+    default="",
+    envvar="DNAC_PASS",
+    hide_input=True,
+    help="Password for login account",
 )
 @click.pass_context
 def login(ctx, dnac_url, username, password):
-    """Use username and password to authenticate to DNAC and retrieve token. Token will be saved as environment variable for future use."""
+    """Use username and password to authenticate to DNAC."""
     click.echo("Attempting to login to DNAC...")
     if not dnac_url:
-        raise ValueError(
+        raise click.ClickException(
             "DNAC URL has not been provided and has not been set as an environment variable."
         )
     headers = {
@@ -93,8 +97,13 @@ def login(ctx, dnac_url, username, password):
         # Set new token as env var and update .env file
         os.environ["DNAC_TOKEN"] = actual_token
         set_key(dotenv_file, "DNAC_TOKEN", os.environ["DNAC_TOKEN"])
+    elif token.status_code == 401:
+        click.echo(
+            "Unauthorized. Token not generated. Please make sure a proper username and password are provided and correct."
+        )
     else:
         click.echo("Token not generated. Please try again...")
+        click.echo(f"Status code: {token.status_code}. Error message: {token.text}.")
 
 
 @dnac_cli.group()

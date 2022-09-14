@@ -21,7 +21,7 @@ def devices(ctx, hostname):
         "X-Auth-Token": ctx.obj.token,
     }
     if not ctx.obj.dnac_url:
-        raise ValueError(
+        raise click.ClickException(
             "DNAC URL has not been provided and has not been set as an environment variable."
         )
     if hostname:
