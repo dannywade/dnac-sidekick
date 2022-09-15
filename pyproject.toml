@@ -37,7 +37,7 @@ typing-extensions = "4.3.0"
 urllib3 = "1.26.12"
 
 [tool.poetry.scripts]
-dnac_sidekick = "dnac_sidekick.cli:dnac_cli"
+dnac-sidekick = "dnac_sidekick.cli:dnac_cli"
 
 
 [build-system]
