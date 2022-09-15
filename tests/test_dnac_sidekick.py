@@ -84,3 +84,25 @@ def test_dnac_command_runner():
     )
     time.sleep(3)
     assert result.exit_code == 0
+
+
+def test_dnac_get_licenses():
+    requests.packages.urllib3.disable_warnings()
+    runner = CliRunner()
+    result = runner.invoke(
+        dnac_cli,
+        ["get", "licenses"],
+    )
+    time.sleep(3)
+    assert result.exit_code == 0
+
+
+def test_dnac_get_device_licenses():
+    requests.packages.urllib3.disable_warnings()
+    runner = CliRunner()
+    result = runner.invoke(
+        dnac_cli,
+        ["get", "licenses", "--device", "spine1.abc.inc"],
+    )
+    time.sleep(3)
+    assert result.exit_code == 0
