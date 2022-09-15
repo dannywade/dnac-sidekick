@@ -22,6 +22,7 @@ from dotenv import load_dotenv, set_key
 from dnac_sidekick.inventory import commands as inventory_cmds
 from dnac_sidekick.health import commands as health_cmds
 from dnac_sidekick.device_commands import commands as device_commands_cmds
+from dnac_sidekick.licenses import commands as license_cmds
 
 dotenv_file = "../.env"
 load_dotenv(dotenv_file)
@@ -132,6 +133,7 @@ inventory.add_command(inventory_cmds.devices)
 health.add_command(health_cmds.devices)
 health.add_command(health_cmds.clients)
 dnac_cli.add_command(device_commands_cmds.command_runner)
+get.add_command(license_cmds.licenses)
 
 if __name__ == "__main__":
     dnac_cli()

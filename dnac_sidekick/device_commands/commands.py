@@ -1,8 +1,6 @@
 """ Commands to run CLI commands on network devices in DNAC inventory and view the output. """
 
 import click
-from rich.table import Table
-from rich.console import Console
 import requests
 import json
 
