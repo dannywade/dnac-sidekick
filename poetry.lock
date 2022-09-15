@@ -269,6 +269,7 @@ python-versions = ">=3.6.3,<4.0.0"
 [package.dependencies]
 commonmark = ">=0.9.0,<0.10.0"
 pygments = ">=2.6.0,<3.0.0"
+typing-extensions = {version = ">=4.0.0,<5.0", markers = "python_version < \"3.9\""}
 
 [package.extras]
 jupyter = ["ipywidgets (>=7.5.1,<8.0.0)"]
@@ -304,8 +305,8 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.9"
-content-hash = "d6e423ae236451e90b92664911b0f5a1121b8b2a7f67b7a1f371726ab643497d"
+python-versions = "^3.8"
+content-hash = "27485389bb988c08039615e0020e3e5ac45d0d45b1760e0b813ae9d6c8b9cc0e"
 
 [metadata.files]
 attrs = [

@@ -16,7 +16,7 @@ import json
 )
 @click.pass_context
 def command_runner(ctx, device, command):
-    """Retrieve all devices from DNAC inventory"""
+    """Run 'show' commands on network devices in DNAC."""
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",

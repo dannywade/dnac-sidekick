@@ -41,7 +41,7 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  command-runner  Retrieve all devices from DNAC inventory
+  command-runner  Run 'show' commands on network devices in DNAC.
   get             Action for read-only tasks and gathering information.
   login           Use username and password to authenticate to DNAC.
 ```
