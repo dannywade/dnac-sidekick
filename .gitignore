@@ -4,3 +4,6 @@ __pycache__
 .coverage*
 .pytest*
 *.pyc
+
+# release/packaging
+dist
