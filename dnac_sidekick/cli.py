@@ -44,7 +44,13 @@ def dnac_cli(ctx):
     Extract sensitive info from environment variables that will be used to connect to DNA Center and add to Click Context.
     By adding to Click Context, these values can be used across all commands.
     """
-    dnac_url = os.environ.get("DNAC_URL")
+    set_dnac_url = os.environ.get("DNAC_URL")
+    # must remove trailing '/' in URL, if one is provided by user. Otherwise, it will mess up future API calls if not caught and removed.
+    if set_dnac_url[-1] == "/":
+        dnac_url = set_dnac_url.rstrip(set_dnac_url[-1])
+    else:
+        dnac_url = set_dnac_url
+    print(dnac_url)
     username = os.environ.get("DNAC_USER")
     password = os.environ.get("DNAC_PASS")
     token = os.environ.get("DNAC_TOKEN")
@@ -81,6 +87,9 @@ def login(ctx, dnac_url, username, password):
         raise click.ClickException(
             "DNAC URL has not been provided and has not been set as an environment variable."
         )
+    # Since value is being read from env var, and not context, need to add extra logic
+    if dnac_url[-1] == "/":
+        dnac_url = dnac_url.rstrip(dnac_url[-1])
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",

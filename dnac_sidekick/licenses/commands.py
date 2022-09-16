@@ -12,7 +12,7 @@ import requests
 )
 @click.pass_context
 def licenses(ctx, device):
-    """Run 'show' commands on network devices in DNAC."""
+    """Get license info for devices in DNAC inventory."""
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
@@ -49,7 +49,9 @@ def licenses(ctx, device):
         if dev_licensing_resp.status_code == 200:
             device_lic_details = dev_licensing_resp.json()
             table = Table(title="DNAC Network Device Licensing")
-            table.add_column("Network License Level", justify="left", style="blue")
+            table.add_column(
+                "Network License Level", justify="left", style="turquoise2"
+            )
             table.add_column("DNA License Level", justify="left", style="purple")
             table.add_column("License Validity", justify="center", style="cyan")
             table.add_column("Virtual Account", justify="center", style="green")
