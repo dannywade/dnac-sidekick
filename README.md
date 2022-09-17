@@ -15,15 +15,15 @@ python -m pip install dnac-sidekick
 ## Getting Started
 
 ### Authenticating to DNAC
-Users can either store their DNAC login credentials (username/password) as environment variables or use the CLI ` dnac-sidekick login` argument authenticate to their DNAC instance.
+Users can either store their DNAC info and login credentials (DNAC URL/username/password) as environment variables or use the CLI ` dnac-sidekick login` command to authenticate to their DNAC instance.
 
-### CLI Login
+**CLI Login**
 ```
 dnac-sidekick login --dnac_url <url> --username <user> --password <password>
 ```
 Once completed, these values will be used to generate a bearer token and store all values as local environment variables to use with future API requests.
 
-### Environment Variables
+**Environment Variables**
 
 Alternatively, you can set the environment variables yourself. If setting them manually, please use the following names:
 ```
@@ -35,7 +35,7 @@ DNAC_PASS=<password>
 *IMPORTANT:* If setting the environment variables manually, please make sure to generate the bearer token using the `dnac-sidekick login` command. Since the environment variables are set, there's no need to set additional flags.
 
 ## Usage
-If you are ever stuck with what commands are available, please use `--help`. Here's a brief look at what root commands/options available:
+To see what commands are available, use the `--help` option. Here's a brief look at the current root commands available:
 ```
 Options:
   --help  Show this message and exit.
@@ -46,8 +46,35 @@ Commands:
   login           Use username and password to authenticate to DNAC.
 ```
 
+## Feature Highlights
+The goal is to provide features that help extract the most useful information from DNAC for the user. The tool is not built to have full parity with every DNAC API call - it's simply meant to be an engineer's *sidekick* :grin: when interacting with Cisco DNA Center. This feature list will grow, but here are the current tasks that can be performed using DNAC Sidekick:
+
+**Inventory**
+- Device information (all devices or a specific device via hostname)
+  - Hostname
+  - Device type
+  - Serial number
+  - Software version
+- Device license information
+  - Network license level
+  - DNA license level
+  - License validity (valid or expired)
+  - Virtual account
+  - Device UDI
+
+**Assurance**
+- Device health
+- Client health
+  - All
+  - Wired
+  - Wireless
+
+**Command Runner**
+- Run *valid* `show` commands on any device in DNAC inventory
+  - Valid `show` commands are dictated by DNAC
+
 ## Compatibility
 Tested with:
 - DNA Center 2.2.3.4
 
-*Could definitely use help validating against other versions.*
+*If you are able to test with other versions, please open a PR and add it to the list!*

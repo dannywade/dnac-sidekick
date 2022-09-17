@@ -50,7 +50,6 @@ def dnac_cli(ctx):
         dnac_url = set_dnac_url.rstrip(set_dnac_url[-1])
     else:
         dnac_url = set_dnac_url
-    print(dnac_url)
     username = os.environ.get("DNAC_USER")
     password = os.environ.get("DNAC_PASS")
     token = os.environ.get("DNAC_TOKEN")

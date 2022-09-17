@@ -47,23 +47,15 @@ def devices(ctx):
 
 
 @click.command()
-@click.option(
-    "--mac", default="", help="Specify a client's MAC address for more details"
-)
 @click.pass_context
-def clients(ctx, mac):
+def clients(ctx):
     """Retrieve client health for all tracked clients in DNAC"""
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
         "X-Auth-Token": ctx.obj.token,
     }
-    if mac:
-        dnac_client_health = (
-            f"{ctx.obj.dnac_url}/dna/intent/api/v1/client-health?macAddress={mac}"
-        )
-    else:
-        dnac_client_health = f"{ctx.obj.dnac_url}/dna/intent/api/v1/client-health"
+    dnac_client_health = f"{ctx.obj.dnac_url}/dna/intent/api/v1/client-health"
     response = requests.get(url=dnac_client_health, headers=headers, verify=False)
     if response.status_code == 200:
         device_list = response.json()["response"]

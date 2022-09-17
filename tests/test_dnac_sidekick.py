@@ -65,16 +65,6 @@ def test_dnac_get_client_health():
     assert result.exit_code == 0
 
 
-# TODO: Still needs tested. No client data available on always-on DevNet sandbox
-def test_dnac_get_client_by_mac():
-    requests.packages.urllib3.disable_warnings()
-    runner = CliRunner()
-    result = runner.invoke(
-        dnac_cli, ["get", "health", "clients", "--mac", "0000.0000.0000"]
-    )
-    assert result.exit_code == 0
-
-
 def test_dnac_command_runner():
     requests.packages.urllib3.disable_warnings()
     runner = CliRunner()
