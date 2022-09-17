@@ -73,6 +73,33 @@ The goal is to provide features that help extract the most useful information fr
 - Run *valid* `show` commands on any device in DNAC inventory
   - Valid `show` commands are dictated by DNAC
 
+## Examples:
+**Inventory** 
+```
+# All devices
+dnac-sidekick get inventory devices
+
+# Specific device
+dnac-sidekick get inventory devices --hostname leaf1.abc.inc
+
+# License info
+dnac-sidekick get licenses
+```
+
+**Assurance** 
+```
+# Device health
+dnac-sidekick get health devices
+
+# Client health
+dnac-sidekick get health clients
+```
+
+**Command Runner** 
+```
+dnac-sidekick command-runner --device leaf1.abc.inc --command "show run"
+```
+
 ## Compatibility
 Tested with:
 - DNA Center 2.2.3.4
