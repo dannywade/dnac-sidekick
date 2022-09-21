@@ -3,37 +3,39 @@
 import click
 import requests
 import json
+import os
 
 
 @click.command
 @click.option(
-    "--device", default="", help="Specify a device's hostname to run commands."
+    "--device", required=True, help="Specify a device's hostname to run commands."
 )
 @click.option(
-    "--command", default="", help="Specify a command to run on the specified device."
+    "--command", required=True, help="Specify a command to run on the specified device."
 )
-@click.pass_context
-def command_runner(ctx, device, command):
+def command_runner(device, command):
     """Run 'show' commands on network devices in DNAC."""
+    # Confirm all the necessary env vars are set
+    dnac_url = os.environ.get("DNAC_URL")
+    dnac_user = os.environ.get("DNAC_USER")
+    dnac_pass = os.environ.get("DNAC_PASS")
+    dnac_token = os.environ.get("DNAC_TOKEN")
+    # Add values to context for read-only actions to use
+    if None in (dnac_url, dnac_user, dnac_pass, dnac_token):
+        raise click.ClickException("A necessary environment variable has not been set.")
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "X-Auth-Token": ctx.obj.token,
+        "X-Auth-Token": dnac_token,
     }
-    if not ctx.obj.dnac_url:
-        raise click.ClickException(
-            "DNAC URL has not been provided or has not been set as an environment variable."
-        )
-    dnac_devices_url = (
-        f"{ctx.obj.dnac_url}/dna/intent/api/v1/network-device?hostname={device}"
-    )
+    dnac_devices_url = f"{dnac_url}/dna/intent/api/v1/network-device?hostname={device}"
     net_devices_resp = requests.get(url=dnac_devices_url, headers=headers, verify=False)
     if net_devices_resp.status_code == 200:
         dev_id = net_devices_resp.json()["response"][0].get("id")
         if not dev_id:
             raise click.ClickException("Device hostname not found in inventory.")
     dnac_command_run = (
-        f"{ctx.obj.dnac_url}/dna/intent/api/v1/network-device-poller/cli/read-request"
+        f"{dnac_url}/dna/intent/api/v1/network-device-poller/cli/read-request"
     )
     payload = {
         "timeout": 5,
@@ -55,7 +57,7 @@ def command_runner(ctx, device, command):
         print(f"Status code: {comm_run_resp.status_code}")
         print(f"Error: {comm_run_resp.text}")
     # Get task by ID
-    task_check = f"{ctx.obj.dnac_url}/api/v1/task/{task_id}"
+    task_check = f"{dnac_url}/api/v1/task/{task_id}"
     task_check_resp = requests.get(url=task_check, headers=headers, verify=False)
     if task_check_resp.status_code == 200:
         tasks_found = task_check_resp.json()["response"]
@@ -73,7 +75,7 @@ def command_runner(ctx, device, command):
         print(f"Error! Error message: {task_check_resp.text}")
         raise click.ClickException("File ID not found.")
     # Get file by ID
-    dnac_get_file = f"{ctx.obj.dnac_url}/dna/intent/api/v1/file/{file_id}"
+    dnac_get_file = f"{dnac_url}/dna/intent/api/v1/file/{file_id}"
     file_resp = requests.get(url=dnac_get_file, headers=headers, verify=False)
     if net_devices_resp.status_code == 200:
         command_output = file_resp.json()[0]["commandResponses"]["SUCCESS"][command]

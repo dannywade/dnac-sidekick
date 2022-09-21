@@ -15,24 +15,38 @@ pip install dnac-sidekick
 ## Getting Started
 
 ### Authenticating to DNAC
-Users can either store their DNAC info and login credentials (DNAC URL/username/password) as environment variables or use the CLI ` dnac-sidekick login` command to authenticate to their DNAC instance.
-
-**CLI Login**
+DNAC-Sidekick pulls all user-specific information from environmnet variables. Ideally, this would be a more automated process with less manual work for the user, but for now, the following environment variables must be set manually before using the tool:
 ```
-dnac-sidekick login --dnac_url <url> --username <user> --password <password>
-```
-Once completed, these values will be used to automatically generate a bearer token and store all these values as environment variables to use with future API requests.
+Unix/MacOS
+export DNAC_URL=<https://dnac_url>
+export DNAC_USER=<username>
+export DNAC_PASS=<password>
 
-**Environment Variables (recommended)**
-
-Alternatively, you can set the environment variables yourself. If setting them manually, please use the following variable names:
-```
-DNAC_URL=<https://dnac_url>
-DNAC_USER=<username>
-DNAC_PASS=<password>
+Windows
+set DNAC_URL=<https://dnac_url>
+set DNAC_USER=<username>
+set DNAC_PASS=<password>
 ```
 
-*IMPORTANT:* If setting the environment variables manually, please make sure to generate the bearer token using the `dnac-sidekick login` command *AFTER* setting the environment variables. Since the environment variables are already set, there's no need to set any additional flags.
+Once set, we will need to generate a bearer token, which is used to authenticate to the DNAC REST API. You can manually generate this token using curl or Postman, but there's also a built-in command that will generate one for you. This will only work if the URL, username, and password environment variables are set.
+
+```
+dnac-sidekick login 
+
+Token generated successfully!
+Copy token below and set as environment variable for future requests:
+eyJhbGciOiJS.....
+```
+
+*IMPORTANT:* Please make sure to generate the bearer token using the `dnac-sidekick login` command *AFTER* setting the necessary environment variables. Once the token is generated, don't forget to set it as an evironment variable as well.
+
+```
+Unix/MacOS
+export DNAC_TOKEN=<token>
+
+Windows
+set DNAC_TOKEN=<token>
+```
 
 ## Usage
 To see what commands are available, use the `--help` option. Here's a brief look at the current root commands available:

@@ -13,7 +13,14 @@ All tests use the Always-On DNA Center Cisco DevNet sandbox (https://sandboxdnac
 If the DNAC URL or any login credentials change, the tests will need changed accordingly.
 """
 
-os.environ["DNAC_URL"] = "https://sandboxdnac.cisco.com"
+
+def test_env_vars_set():
+    dnac_url = os.environ.get("DNAC_URL")
+    dnac_user = os.environ.get("DNAC_USER")
+    dnac_pass = os.environ.get("DNAC_PASS")
+    dnac_token = os.environ.get("DNAC_TOKEN")
+
+    assert None not in (dnac_url, dnac_user, dnac_pass, dnac_token)
 
 
 def test_dnac_login():
@@ -23,12 +30,6 @@ def test_dnac_login():
         dnac_cli,
         [
             "login",
-            "--dnac_url",
-            "https://sandboxdnac.cisco.com",
-            "--username",
-            "devnetuser",
-            "--password",
-            "Cisco123!",
         ],
     )
     assert result.exit_code == 0
@@ -70,7 +71,7 @@ def test_dnac_command_runner():
     runner = CliRunner()
     result = runner.invoke(
         dnac_cli,
-        ["command-runner", "--device", "spine1.abc.inc", "--command", "show version"],
+        ["command-runner", "--device", "spine1.abc.inc", "--command", "show run"],
     )
     time.sleep(3)
     assert result.exit_code == 0

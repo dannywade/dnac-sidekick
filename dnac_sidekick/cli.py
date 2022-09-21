@@ -17,7 +17,7 @@ import click
 import requests
 from requests.auth import HTTPBasicAuth
 import os
-from dotenv import load_dotenv, set_key
+from dotenv import load_dotenv
 
 from dnac_sidekick.inventory import commands as inventory_cmds
 from dnac_sidekick.health import commands as health_cmds
@@ -44,48 +44,19 @@ def dnac_cli(ctx):
     Extract sensitive info from environment variables that will be used to connect to DNA Center and add to Click Context.
     By adding to Click Context, these values can be used across all commands.
     """
-    set_dnac_url = os.environ.get("DNAC_URL")
-    # must remove trailing '/' in URL, if one is provided by user. Otherwise, it will mess up future API calls if not caught and removed.
-    if set_dnac_url[-1] == "/":
-        dnac_url = set_dnac_url.rstrip(set_dnac_url[-1])
-    else:
-        dnac_url = set_dnac_url
-    username = os.environ.get("DNAC_USER")
-    password = os.environ.get("DNAC_PASS")
-    token = os.environ.get("DNAC_TOKEN")
-    if (dnac_url, username, password, token):
-        ctx.obj = DnacUser(
-            dnac_url=dnac_url, username=username, password=password, token=token
-        )
-    else:
-        click.echo("A necessary environment variable is not set.")
+    pass
 
 
 @dnac_cli.command
-@click.option(
-    "--dnac_url",
-    default="",
-    envvar="DNAC_URL",
-    help="IP/hostname to the DNA Center appliance",
-)
-@click.option(
-    "--username", default="", envvar="DNAC_USER", help="User for login account"
-)
-@click.option(
-    "--password",
-    default="",
-    envvar="DNAC_PASS",
-    hide_input=True,
-    help="Password for login account",
-)
-@click.pass_context
-def login(ctx, dnac_url, username, password):
-    """Use username and password to authenticate to DNAC."""
-    click.echo("Attempting to login to DNAC...")
-    if not dnac_url:
-        raise click.ClickException(
-            "DNAC URL has not been provided and has not been set as an environment variable."
-        )
+def login():
+    """Helper function to quickly generate bearer token and authenticate to DNAC."""
+    # Pull env vars that should be set by user
+    dnac_url = os.environ.get("DNAC_URL")
+    username = os.environ.get("DNAC_USER")
+    password = os.environ.get("DNAC_PASS")
+    # Confirm set env var values are not None
+    if None in (dnac_url, username, password):
+        raise click.ClickException("A necessary environment variable has not been set.")
     # Since value is being read from env var, and not context, need to add extra logic
     if dnac_url[-1] == "/":
         dnac_url = dnac_url.rstrip(dnac_url[-1])
@@ -94,6 +65,7 @@ def login(ctx, dnac_url, username, password):
         "Accept": "application/json",
     }
     dnac_token_url = f"{dnac_url}/dna/system/api/v1/auth/token"
+    click.echo("Attempting to login to DNAC...")
     token = requests.post(
         url=dnac_token_url,
         headers=headers,
@@ -104,8 +76,11 @@ def login(ctx, dnac_url, username, password):
         actual_token = token.json()["Token"]
         click.echo("Token generated successfully!")
         # Set new token as env var and update .env file
-        os.environ["DNAC_TOKEN"] = actual_token
-        set_key(dotenv_file, "DNAC_TOKEN", os.environ["DNAC_TOKEN"])
+        click.echo(
+            "Copy token below and set as environment variable for future requests:"
+        )
+        click.echo(actual_token)
+
     elif token.status_code == 401:
         click.echo(
             "Unauthorized. Token not generated. Please make sure a proper username and password are provided and correct."
@@ -120,7 +95,22 @@ def login(ctx, dnac_url, username, password):
 def get(ctx):
     """Action for read-only tasks and gathering information."""
     click.echo("Getting information...")
-    pass
+
+    # Confirm all the necessary env vars are set
+    dnac_url = os.environ.get("DNAC_URL")
+    dnac_user = os.environ.get("DNAC_USER")
+    dnac_pass = os.environ.get("DNAC_PASS")
+    dnac_token = os.environ.get("DNAC_TOKEN")
+    # Add values to context for read-only actions to use
+    if None not in (dnac_url, dnac_user, dnac_pass, dnac_token):
+        ctx.obj = DnacUser(
+            dnac_url=dnac_url,
+            username=dnac_user,
+            password=dnac_pass,
+            token=dnac_token,
+        )
+    else:
+        raise click.ClickException("A necessary environment variable has not been set.")
 
 
 @get.group()
