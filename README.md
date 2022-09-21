@@ -17,15 +17,9 @@ pip install dnac-sidekick
 ### Authenticating to DNAC
 DNAC-Sidekick pulls all user-specific information from environmnet variables. Ideally, this would be a more automated process with less manual work for the user, but for now, the following environment variables must be set manually before using the tool:
 ```
-Unix/MacOS
 export DNAC_URL=<https://dnac_url>
 export DNAC_USER=<username>
 export DNAC_PASS=<password>
-
-Windows
-set DNAC_URL=<https://dnac_url>
-set DNAC_USER=<username>
-set DNAC_PASS=<password>
 ```
 
 Once set, we will need to generate a bearer token, which is used to authenticate to the DNAC REST API. You can manually generate this token using curl or Postman, but there's also a built-in command that will generate one for you. This will only work if the URL, username, and password environment variables are set.
@@ -38,14 +32,10 @@ Copy token below and set as environment variable for future requests:
 eyJhbGciOiJS.....
 ```
 
-*IMPORTANT:* Please make sure to generate the bearer token using the `dnac-sidekick login` command *AFTER* setting the necessary environment variables. Once the token is generated, don't forget to set it as an evironment variable as well.
+*IMPORTANT:* Please make sure to generate the bearer token using the `dnac-sidekick login` command *AFTER* setting the necessary environment variables. Once the token is generated, don't forget to set it as an environment variable as well.
 
 ```
-Unix/MacOS
 export DNAC_TOKEN=<token>
-
-Windows
-set DNAC_TOKEN=<token>
 ```
 
 ## Usage
