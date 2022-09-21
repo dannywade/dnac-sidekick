@@ -2,14 +2,14 @@
 [![codecov](https://codecov.io/gh/dannywade/dnac-sidekick/branch/main/graph/badge.svg?token=IWBEDN1YXH)](https://codecov.io/gh/dannywade/dnac-sidekick)
 
 # dnac-sidekick
-DNAC Sidekick is a CLI app used to interact with Cisco DNA Center. It's built using the [Click](https://github.com/pallets/click) and [Rich](https://github.com/Textualize/rich) libraries. The Rich library is what helps make the output look cleaner to the end-user. 
+DNAC Sidekick is a CLI app used to interact with Cisco DNA Center (DNAC). It's built using the [Click](https://github.com/pallets/click) and [Rich](https://github.com/Textualize/rich) libraries. The Rich library is what helps make the output look cleaner to the end-user. 
 
-The goal of the tool is to provide a clean and user-friendly CLI interface. All interactions with DNAC use the available DNAC API, so please make sure that is enabled and the user account(s) used have proper permissions.
+The goal of the tool is to provide a clean and user-friendly CLI interface to quickly pull information from DNA Center. All interactions with DNAC uses DNA Center's REST API, so please make sure that the REST API is enabled and the user account(s) used with this tool have proper API permissions.
 
 ## Installation
 Install using `pip` or any other PyPi package manager:
 ```
-python -m pip install dnac-sidekick
+pip install dnac-sidekick
 ```
 
 ## Getting Started
@@ -21,18 +21,18 @@ Users can either store their DNAC info and login credentials (DNAC URL/username/
 ```
 dnac-sidekick login --dnac_url <url> --username <user> --password <password>
 ```
-Once completed, these values will be used to generate a bearer token and store all values as local environment variables to use with future API requests.
+Once completed, these values will be used to automatically generate a bearer token and store all these values as environment variables to use with future API requests.
 
-**Environment Variables**
+**Environment Variables (recommended)**
 
-Alternatively, you can set the environment variables yourself. If setting them manually, please use the following names:
+Alternatively, you can set the environment variables yourself. If setting them manually, please use the following variable names:
 ```
 DNAC_URL=<https://dnac_url>
 DNAC_USER=<username>
 DNAC_PASS=<password>
 ```
 
-*IMPORTANT:* If setting the environment variables manually, please make sure to generate the bearer token using the `dnac-sidekick login` command. Since the environment variables are set, there's no need to set additional flags.
+*IMPORTANT:* If setting the environment variables manually, please make sure to generate the bearer token using the `dnac-sidekick login` command *AFTER* setting the environment variables. Since the environment variables are already set, there's no need to set any additional flags.
 
 ## Usage
 To see what commands are available, use the `--help` option. Here's a brief look at the current root commands available:
@@ -47,7 +47,7 @@ Commands:
 ```
 
 ## Feature Highlights
-The goal is to provide features that help extract the most useful information from DNAC for the user. The tool is not built to have full parity with every DNAC API call - it's simply meant to be an engineer's *sidekick* :grin: when interacting with Cisco DNA Center. This feature list will grow, but here are the current tasks that can be performed using DNAC Sidekick:
+The goal is to provide features that help extract the most useful information from DNAC for the user. The tool is not built to have a command for every available DNAC API call - it's simply meant to be an engineer's *sidekick* :grin: when interacting with Cisco DNA Center. This feature list will grow, but here are the current tasks that can be performed using DNAC Sidekick:
 
 **Inventory**
 - Device information (all devices or a specific device via hostname)
@@ -99,6 +99,29 @@ dnac-sidekick get health clients
 ```
 dnac-sidekick command-runner --device leaf1.abc.inc --command "show run"
 ```
+
+<details>
+<summary>Sample Outputs</summary>
+
+***All sample outputs use the Cisco DevNet Always-on DNAC sandbox.***
+
+### Network Inventory
+![Network Inventory](./imgs/get_network_inventory.png)
+
+### Network Inventory - Specific Device
+![Inventory - Specific Device](./imgs/get_specific_device.png)
+
+### Device Licensing
+![Device Licensing](./imgs/get_device_licensing.png)
+
+### Device Health
+![Device Health](./imgs/get_device_health.png)
+
+### Client Health
+![Client Health](./imgs/get_client_health.png)
+
+</details>
+<br>
 
 ## Compatibility
 Tested with:
