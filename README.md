@@ -130,5 +130,6 @@ dnac-sidekick command-runner --device leaf1.abc.inc --command "show run"
 ## Compatibility
 Tested with:
 - DNA Center 2.2.3.4
+- DNA Center 2.3.4.0
 
 *If you are able to test with other versions, please open a PR and add it to the list!*
