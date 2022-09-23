@@ -1,5 +1,6 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![codecov](https://codecov.io/gh/dannywade/dnac-sidekick/branch/main/graph/badge.svg?token=IWBEDN1YXH)](https://codecov.io/gh/dannywade/dnac-sidekick)
+[![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)](https://developer.cisco.com/codeexchange/github/repo/dannywade/dnac-sidekick)
 
 # dnac-sidekick
 DNAC Sidekick is a CLI app used to interact with Cisco DNA Center (DNAC). It's built using the [Click](https://github.com/pallets/click) and [Rich](https://github.com/Textualize/rich) libraries. The Rich library is what helps make the output look cleaner to the end-user. 
@@ -130,6 +131,7 @@ dnac-sidekick command-runner --device leaf1.abc.inc --command "show run"
 ## Compatibility
 Tested with:
 - DNA Center 2.2.3.4
+- DNA Center 2.2.3.6
 - DNA Center 2.3.4.0
 
 *If you are able to test with other versions, please open a PR and add it to the list!*
