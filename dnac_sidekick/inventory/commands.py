@@ -1,9 +1,29 @@
 """ Commands to gather information related to device inventory in DNAC """
 
 import click
+from math import ceil
 from rich.table import Table
 from rich.console import Console
 import requests
+
+
+@click.pass_context
+def get_device_count(ctx):
+    """Retrieve device count from DNAC inventory"""
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "X-Auth-Token": ctx.obj.token,
+    }
+    if not ctx.obj.dnac_url:
+        raise click.ClickException(
+            "DNAC URL has not been provided and has not been set as an environment variable."
+        )
+    device_count_url = f"{ctx.obj.dnac_url}/dna/intent/api/v1/network-device/count"
+    response = requests.get(url=device_count_url, headers=headers, verify=False)
+    if response.status_code == 200:
+        device_count = response.json()["response"]
+        return device_count
 
 
 @click.command
@@ -24,15 +44,45 @@ def devices(ctx, hostname):
         raise click.ClickException(
             "DNAC URL has not been provided and has not been set as an environment variable."
         )
+    # Get total number of devices to figure out offset for larger inventories
+    total_dev_count = get_device_count()
+    # Default and max limit for device inventory is 500, so we need to figure out how many API calls to make
+    total_pages = ceil(total_dev_count / 500)
+
     if hostname:
         dnac_devices_url = (
             f"{ctx.obj.dnac_url}/dna/intent/api/v1/network-device?hostname={hostname}"
         )
-    else:
-        dnac_devices_url = f"{ctx.obj.dnac_url}/dna/intent/api/v1/network-device"
-    response = requests.get(url=dnac_devices_url, headers=headers, verify=False)
-    if response.status_code == 200:
+        response = requests.get(url=dnac_devices_url, headers=headers, verify=False)
         device_list = response.json()["response"]
+    else:
+        # Since hostname was not provided, get all devices from DNAC inventory
+        # There's a hard limit to only return 500 devices per call, so we must change the params
+        # if there's more than 500 devices in the inventory
+        dnac_devices_url = f"{ctx.obj.dnac_url}/dna/intent/api/v1/network-device"
+        if total_pages == 1:
+            # Initial call to DNAC
+            response = requests.get(
+                url=dnac_devices_url,
+                headers=headers,
+                verify=False,
+            )
+            device_list = response.json()["response"]
+        else:
+            for page in range(total_pages):
+                # Make additional calls (if necessary) - needed for inventories with more than 500 devices
+                response = requests.get(
+                    url=dnac_devices_url,
+                    headers=headers,
+                    params={"limit": 500, "offset": page * 500},
+                    verify=False,
+                )
+                # Add devices to the response from the initial call
+                if response.status_code == 200:
+                    device_list.extend(response.json()["response"])
+
+    if device_list:
+        # Output nicely formatted table of inventory devices
         table = Table(title="DNAC Network Devices")
         table.add_column("Hostname", justify="left", style="purple")
         table.add_column("Device Type", justify="left", style="cyan")
@@ -49,7 +99,6 @@ def devices(ctx, hostname):
 
         console = Console()
         console.print(table)
-        # click.echo(f"Here's a list of devices: {console.print(table)}")
     elif response.status_code == 401:
         click.echo("Unauthorized. Please verify your token is valid.")
         click.echo(response.text)
