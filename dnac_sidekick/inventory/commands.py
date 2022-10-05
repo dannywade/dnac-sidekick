@@ -60,16 +60,18 @@ def devices(ctx, hostname):
         # There's a hard limit to only return 500 devices per call, so we must change the params
         # if there's more than 500 devices in the inventory
         dnac_devices_url = f"{ctx.obj.dnac_url}/dna/intent/api/v1/network-device"
-        if total_pages == 1:
-            # Initial call to DNAC
-            response = requests.get(
-                url=dnac_devices_url,
-                headers=headers,
-                verify=False,
-            )
-            device_list = response.json()["response"]
-        else:
-            for page in range(total_pages):
+        # Initialize device list
+        device_list = []
+        for page in range(total_pages):
+            if page < 1:
+                # Initial call to DNAC
+                response = requests.get(
+                    url=dnac_devices_url,
+                    headers=headers,
+                    verify=False,
+                )
+                device_list = response.json()["response"]
+            else:
                 # Make additional calls (if necessary) - needed for inventories with more than 500 devices
                 response = requests.get(
                     url=dnac_devices_url,
