@@ -48,7 +48,6 @@ def devices(ctx, hostname):
     total_dev_count = get_device_count()
     # Default and max limit for device inventory is 500, so we need to figure out how many API calls to make
     total_pages = ceil(total_dev_count / 500)
-    print(f"Total pages: {total_pages}")
     if hostname:
         dnac_devices_url = (
             f"{ctx.obj.dnac_url}/dna/intent/api/v1/network-device?hostname={hostname}"
@@ -62,10 +61,8 @@ def devices(ctx, hostname):
         # Initialize device list
         device_list = []
         for page in range(total_pages):
-            print(f"Page: {page}")
             # Make additional calls (if necessary) - needed for inventories with more than 500 devices
             calc_offset = page * 500
-            print(f"Calculated offset: {calc_offset}")
             if calc_offset > 0:
                 dnac_devices_url = f"{ctx.obj.dnac_url}/dna/intent/api/v1/network-device?limit=500&offset={calc_offset}"
             else:
@@ -81,12 +78,10 @@ def devices(ctx, hostname):
             if response.status_code == 200:
                 # Add devices to the response from the initial call
                 device_list.extend(response.json()["response"])
-                print("More devices added!")
             else:
                 raise click.ClickException(
                     f"There was an error collecting the device inventory. HTTP code: {response.status_code}. Error message: {response.text}"
                 )
-    print(f"Length of device list: {len(device_list)}")
     if device_list:
         # Output nicely formatted table of inventory devices
         table = Table(title="DNAC Network Devices")
