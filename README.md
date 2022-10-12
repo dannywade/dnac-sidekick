@@ -135,3 +135,7 @@ Tested with:
 - DNA Center 2.3.4.0
 
 *If you are able to test with other versions, please open a PR and add it to the list!*
+
+## Credits
+This section is dedicated to those that have helped test and make this tool better!
+- [raoulmorik](https://github.com/raoulmorik)
