@@ -35,11 +35,19 @@ def test_dnac_login():
     assert result.exit_code == 0
 
 
-def test_dnac_get_devices(devnet_sbx_dnac):
+def test_dnac_get_devices_table_output():
     requests.packages.urllib3.disable_warnings()
-    os.environ["DNAC_TOKEN"] = devnet_sbx_dnac
     runner = CliRunner()
     result = runner.invoke(dnac_cli, ["get", "inventory", "devices"])
+    assert result.exit_code == 0
+
+
+def test_dnac_get_devices_json_output():
+    requests.packages.urllib3.disable_warnings()
+    runner = CliRunner()
+    result = runner.invoke(
+        dnac_cli, ["get", "inventory", "devices", "--output", "json"]
+    )
     assert result.exit_code == 0
 
 
@@ -96,4 +104,11 @@ def test_dnac_get_device_licenses():
         ["get", "licenses", "--device", "spine1.abc.inc"],
     )
     time.sleep(3)
+    assert result.exit_code == 0
+
+
+def test_dnac_generate_pyats_testbed():
+    requests.packages.urllib3.disable_warnings()
+    runner = CliRunner()
+    result = runner.invoke(dnac_cli, ["generate", "pyats-testbed"], input="y\n")
     assert result.exit_code == 0

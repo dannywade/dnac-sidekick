@@ -1,0 +1,26 @@
+---
+
+testbed:
+    name: DNAC_Sidekick_Testbed
+    credentials:
+        default:
+            username: {{ user }}
+            password: {{ pass }}
+        enable:
+            password: {{ enable_pass }}
+
+devices:
+{%- for device in device_data %}
+    {{ device.hostname }}:
+        type: {{ device.type }}
+        {% if "Cisco Controller" in device.softwareType -%}
+        os: aireos
+        {% else -%}
+        os: {{ device.softwareType | lower | replace("-","") }}
+        {% endif -%}
+        connections:
+            cli:
+                protocol: ssh
+                ip: {{ device.managementIpAddress }}
+                port: 22
+{%- endfor %}

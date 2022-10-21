@@ -1,7 +1,10 @@
 """ Commands to gather information related to device inventory in DNAC """
 
+import json
+import os
 import click
 from math import ceil
+from rich import print_json, print
 from rich.table import Table
 from rich.console import Console
 import requests
@@ -32,8 +35,15 @@ def get_device_count(ctx):
     default="",
     help="Specify a device's hostname to retrieve from inventory",
 )
+@click.option(
+    "--output",
+    type=click.Choice(["table", "json"], case_sensitive=False),
+    default="table",
+    show_default=True,
+    help="Specify an output format",
+)
 @click.pass_context
-def devices(ctx, hostname):
+def devices(ctx, hostname, output):
     """Retrieve all devices from DNAC inventory"""
     headers = {
         "Content-Type": "application/json",
@@ -82,7 +92,7 @@ def devices(ctx, hostname):
                 raise click.ClickException(
                     f"There was an error collecting the device inventory. HTTP code: {response.status_code}. Error message: {response.text}"
                 )
-    if device_list:
+    if device_list and output == "table":
         # Output nicely formatted table of inventory devices
         table = Table(title="DNAC Network Devices")
         table.add_column("Hostname", justify="left", style="purple")
@@ -100,8 +110,12 @@ def devices(ctx, hostname):
 
         console = Console()
         console.print(table)
-    elif response.status_code == 401:
-        click.echo("Unauthorized. Please verify your token is valid.")
-        click.echo(response.text)
-    else:
-        click.echo("Could not retrieve list of network devices from DNAC.")
+    elif device_list and output == "json":
+        dev_list_out = json.dumps(device_list)
+        print_json(f"{dev_list_out}")
+        with open("dnac_inventory.json", "w") as outfile:
+            outfile.write(dev_list_out)
+            print(
+                f"[bold bright_yellow]JSON output saved at {os.path.dirname(os.getcwd())}/dnac_inventory.json[/bold bright_yellow]"
+            )
+        return dev_list_out

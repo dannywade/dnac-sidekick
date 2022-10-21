@@ -23,6 +23,7 @@ from dnac_sidekick.inventory import commands as inventory_cmds
 from dnac_sidekick.health import commands as health_cmds
 from dnac_sidekick.device_commands import commands as device_commands_cmds
 from dnac_sidekick.licenses import commands as license_cmds
+from dnac_sidekick.generate import commands as generate_cmds
 
 dotenv_file = "../.env"
 load_dotenv(dotenv_file)
@@ -127,11 +128,35 @@ def health(ctx):
     pass
 
 
+@dnac_cli.group()
+@click.pass_context
+def generate(ctx):
+    """Action to generate testbeds and inventory files."""
+    click.echo("Generating...")
+
+    # Confirm all the necessary env vars are set
+    dnac_url = os.environ.get("DNAC_URL")
+    dnac_user = os.environ.get("DNAC_USER")
+    dnac_pass = os.environ.get("DNAC_PASS")
+    dnac_token = os.environ.get("DNAC_TOKEN")
+    # Add values to context for read-only actions to use
+    if None not in (dnac_url, dnac_user, dnac_pass, dnac_token):
+        ctx.obj = DnacUser(
+            dnac_url=dnac_url,
+            username=dnac_user,
+            password=dnac_pass,
+            token=dnac_token,
+        )
+    else:
+        raise click.ClickException("A necessary environment variable has not been set.")
+
+
 inventory.add_command(inventory_cmds.devices)
 health.add_command(health_cmds.devices)
 health.add_command(health_cmds.clients)
 dnac_cli.add_command(device_commands_cmds.command_runner)
 get.add_command(license_cmds.licenses)
+generate.add_command(generate_cmds.pyats_testbed)
 
 if __name__ == "__main__":
     dnac_cli()
