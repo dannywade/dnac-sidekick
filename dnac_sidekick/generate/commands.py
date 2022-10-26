@@ -2,13 +2,13 @@
 
 import json
 import click
+from dnac_sidekick.helpers.topology import get_assigned_devices, get_site_hierarchy
 from dnac_sidekick.inventory.commands import devices
 from jinja2 import Environment, FileSystemLoader
 import os
 from rich import print
-from rich.table import Table
-from rich.console import Console
 import requests
+import yaml
 
 
 @click.command()
@@ -21,7 +21,7 @@ import requests
 )
 @click.pass_context
 def pyats_testbed(ctx, output):
-    """Retrieve device health for all devices in DNAC inventory"""
+    """Generate pyATS testbed of all devices in DNAC inventory"""
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
@@ -82,3 +82,41 @@ def pyats_testbed(ctx, output):
             print(
                 f"[bold bright_yellow]YAML testbed saved at {os.path.dirname(os.getcwd())}/pyats_testbed.yaml[/bold bright_yellow]"
             )
+
+
+# @click.command()
+# @click.option(
+#     "--output",
+#     type=click.Choice(["yaml"], case_sensitive=False),
+#     default="yaml",
+#     show_default=True,
+#     help="Specify an output format",
+# )
+def ansible_inventory():
+    """Generate Ansible inventory of all devices in DNAC inventory"""
+    site_topo = get_site_hierarchy()
+    devices = get_assigned_devices()
+    inventory = {"all": {"children": {}}}
+    # Create site hierarchy, then add devices
+    # Create top-level sites in hierarchy
+    for site_id, dets in site_topo.items():
+        if dets["groupNameHierarchy"].count("/") == 1:
+            # Confirms that parentId is 'Global' and is a top-level "area" in DNAC
+            inventory["all"]["children"].update(
+                {dets["name"]: {"children": {}, "hosts": {}}}
+            )
+    # Add sites that are belong to a parent site
+    for site_id, dets in site_topo.items():
+        for key, val in site_topo.items():
+            if key == dets["parentId"]:
+                inventory["all"]["children"][val["name"]]["children"].update(
+                    {dets["name"]: {"hosts": {}}}
+                )
+
+    # TODO: Add devices to their assigned sites
+
+    print(yaml.dump(inventory))
+
+
+if __name__ == "__main__":
+    ansible_inventory()
