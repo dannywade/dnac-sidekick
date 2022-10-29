@@ -1,9 +1,15 @@
 """ Commands to generate testbeds and other inventory files sourcing from DNAC inventory """
 
+import ast
 import json
 import click
-from dnac_sidekick.helpers.topology import get_assigned_devices, get_site_hierarchy
+from dnac_sidekick.helpers.topology import (
+    get_assigned_devices,
+    get_site_hierarchy,
+    iterate_all,
+)
 from dnac_sidekick.inventory.commands import devices
+from genie.utils import Dq
 from jinja2 import Environment, FileSystemLoader
 import os
 from rich import print
@@ -96,24 +102,47 @@ def ansible_inventory():
     """Generate Ansible inventory of all devices in DNAC inventory"""
     site_topo = get_site_hierarchy()
     devices = get_assigned_devices()
-    inventory = {"all": {"children": {}}}
+    inventory = {"all": {"children": {}, "hosts": {}}}
     # Create site hierarchy, then add devices
     # Create top-level sites in hierarchy
-    for site_id, dets in site_topo.items():
+    for dets in site_topo.values():
         if dets["groupNameHierarchy"].count("/") == 1:
             # Confirms that parentId is 'Global' and is a top-level "area" in DNAC
             inventory["all"]["children"].update(
                 {dets["name"]: {"children": {}, "hosts": {}}}
             )
     # Add sites that are belong to a parent site
-    for site_id, dets in site_topo.items():
+    for dets in site_topo.values():
         for key, val in site_topo.items():
+            # TODO: Create recursive algorithm to discover all parents
             if key == dets["parentId"]:
                 inventory["all"]["children"][val["name"]]["children"].update(
                     {dets["name"]: {"hosts": {}}}
                 )
 
-    # TODO: Add devices to their assigned sites
+    for dev in devices.values():
+        if dev["siteId"] != "unassigned":
+            for site_id, dets in site_topo.items():
+                if dev["siteId"] == site_id:
+                    site_loc = Dq(inventory).contains(dets["name"]).reconstruct()
+                    # Captures entire path needed to add hosts to a particular site in a list
+                    site_list = list(iterate_all(site_loc))
+                    print(site_list)
+                    inv_str_eval = "inventory"
+                    # Creates a string that will have the proper syntax to find the proper "hosts" key
+                    # For ex: inventory["all"]["children"]["san_jose"]["children"]["sjc_20"]["hosts"]
+                    for idx, site in enumerate(site_list):
+                        if site != site_list:
+                            inv_str_eval += f"['{site_list[idx]}']"
+                    # Once proper path is created, update the the "hosts" key (last key in path) with host info
+                    inv_str_eval += f".update({{'{dev['hostname']}' : {{'ansible_host': '{dev['ip']}'}}}})"
+                    # Once string literal is built, use eval() to parse and run the expression
+                    eval(inv_str_eval)
+                    print(inventory)
+        else:
+            inventory["all"]["hosts"].update(
+                {dev["hostname"]: {"ansible_host": dev["ip"]}}
+            )
 
     print(yaml.dump(inventory))
 
