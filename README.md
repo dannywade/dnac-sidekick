@@ -47,6 +47,7 @@ Options:
 
 Commands:
   command-runner  Run 'show' commands on network devices in DNAC.
+  generate        Action to generate testbeds and inventory files.
   get             Action for read-only tasks and gathering information.
   login           Use username and password to authenticate to DNAC.
 ```
@@ -78,6 +79,10 @@ The goal is to provide features that help extract the most useful information fr
 - Run *valid* `show` commands on any device in DNAC inventory
   - Valid `show` commands are dictated by DNAC
 
+**Generate**
+- Ability to generate a pyATS testbed file from DNAC inventory
+- Ability to generate an Ansible inventory file from DNAC inventory
+
 ## Examples:
 **Inventory** 
 ```
@@ -104,6 +109,16 @@ dnac-sidekick get health clients
 ```
 dnac-sidekick command-runner --device leaf1.abc.inc --command "show run"
 ```
+
+**Generate**
+```
+# pyATS testbed
+dnac-sidekick generate pyats-testbed
+
+# Ansible inventory
+dnac-sidekick generate ansible-inventory
+```
+
 
 <details>
 <summary>Sample Outputs</summary>
