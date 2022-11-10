@@ -1,4 +1,5 @@
 """Module for helper fuctions to pull topology and site information from DNA Center"""
+from typing import Union
 import click
 import os
 import requests
@@ -49,7 +50,6 @@ def get_site_hierarchy() -> dict:
     else:
         click.echo(f"HTTP Status Code: {response.status_code}")
         click.echo("Unauthorized. Please verify your token is valid.")
-    print(site_structure)
     return site_structure
 
 
@@ -111,31 +111,43 @@ def get_assigned_devices() -> dict:
     return node_structure
 
 
-def iterate_all(iterable, returned="key"):
-
-    """Returns an iterator that returns all keys or values
-    of a (nested) iterable.
-
-    Arguments:
-        - iterable: <list> or <dictionary>
-        - returned: <string> "key" or "value"
-
-    Returns:
-        - <iterator>
+def dict_query(d: dict, path: str) -> Union[object, None]:
     """
+    # Example usage:
+    >>> d = {'a': [{}, {'b': 9}]}
+    >>> print( dict_query(d, 'a/1/b') )
+    9
+    """
+    keys = path.split("/")
+    val = d
 
-    if isinstance(iterable, dict):
-        for key, value in iterable.items():
-            if returned == "key":
-                yield key
-            elif returned == "value":
-                if not (isinstance(value, dict) or isinstance(value, list)):
-                    yield value
-            else:
-                raise ValueError("'returned' keyword only accepts 'key' or 'value'.")
-            for ret in iterate_all(value, returned=returned):
-                yield ret
-    elif isinstance(iterable, list):
-        for el in iterable:
-            for ret in iterate_all(el, returned=returned):
-                yield ret
+    try:
+        for key in keys:
+            try:
+                val = val[key]
+
+            except (KeyError, TypeError):
+                val = val[int(key)]
+
+        return val
+
+    except (IndexError, KeyError, TypeError, ValueError):
+        return None
+
+
+def get_all_keys(d):
+    for key, value in d.items():
+        yield key
+        if isinstance(value, dict):
+            yield from get_all_keys(value)
+
+
+def get_site_name_by_id(sites: dict, site_id: str) -> Union[str, None]:
+    """Function used to get the site name given the site ID"""
+    all_site_ids = get_all_keys(sites)
+    if site_id in all_site_ids:
+        site_name = sites.get(site_id)
+        return site_name["name"]
+    else:
+        # For top-level sites (Global is the parent, so ID won't be found)
+        return "all"

@@ -157,6 +157,7 @@ health.add_command(health_cmds.clients)
 dnac_cli.add_command(device_commands_cmds.command_runner)
 get.add_command(license_cmds.licenses)
 generate.add_command(generate_cmds.pyats_testbed)
+generate.add_command(generate_cmds.ansible_inventory)
 
 if __name__ == "__main__":
     dnac_cli()

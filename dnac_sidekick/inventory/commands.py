@@ -37,7 +37,7 @@ def get_device_count(ctx):
 )
 @click.option(
     "--output",
-    type=click.Choice(["table", "json"], case_sensitive=False),
+    type=click.Choice(["table", "json", "none"], case_sensitive=False),
     default="table",
     show_default=True,
     help="Specify an output format",
@@ -118,4 +118,6 @@ def devices(ctx, hostname, output):
             print(
                 f"[bold bright_yellow]JSON output saved at {os.path.dirname(os.getcwd())}/dnac_inventory.json[/bold bright_yellow]"
             )
+    elif device_list and output == "none":
+        dev_list_out = json.dumps(device_list)
         return dev_list_out

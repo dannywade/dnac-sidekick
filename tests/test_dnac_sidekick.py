@@ -110,5 +110,14 @@ def test_dnac_get_device_licenses():
 def test_dnac_generate_pyats_testbed():
     requests.packages.urllib3.disable_warnings()
     runner = CliRunner()
-    result = runner.invoke(dnac_cli, ["generate", "pyats-testbed"], input="y\n")
+    result = runner.invoke(
+        dnac_cli, ["generate", "pyats-testbed"], input="admin\nadmin\ny\n"
+    )
+    assert result.exit_code == 0
+
+
+def test_dnac_generate_ansible_inventory():
+    requests.packages.urllib3.disable_warnings()
+    runner = CliRunner()
+    result = runner.invoke(dnac_cli, ["generate", "ansible-inventory"])
     assert result.exit_code == 0

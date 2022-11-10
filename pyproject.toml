@@ -37,8 +37,6 @@ typing-extensions = "4.3.0"
 urllib3 = "1.26.12"
 Jinja2 = "^3.1.2"
 PyYAML = "^6.0"
-genie = "^22.10"
-pyats = "^22.10"
 
 [tool.poetry.scripts]
 dnac-sidekick = "dnac_sidekick.cli:dnac_cli"
